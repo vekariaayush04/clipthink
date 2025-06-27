@@ -13,9 +13,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@repo/db": "workspace:*",
     "@types/express": "^5.0.3",
+    "bullmq": "^5.56.0",
+    "cloudinary": "^2.7.0",
+    "dotenv": "^16.6.0",
     "express": "^5.1.0",
-    "@repo/db" : "workspace:*"
+    "ioredis": "^5.6.1",
+    "openai": "^5.8.2"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*"

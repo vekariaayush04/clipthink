@@ -1,30 +1,31 @@
-"use client"
-import type React from "react"
-import { useState, useCallback } from "react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { LoadingState } from "@/components/loading-state"
-import { VideoPlayer } from "@/components/video-player"
-import { useVideoGeneration } from "@/hooks/use-video-generation"
-import { ArrowRight, Sparkles } from "lucide-react"
+"use client";
+import type React from "react";
+import { useState, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { LoadingState } from "@/components/loading-state";
+import { VideoPlayer } from "@/components/video-player";
+import { useVideoGeneration } from "@/hooks/use-video-generation";
+import { ArrowRight, ArrowUp, Sparkles } from "lucide-react";
 
 export function VideoGenerator() {
-  const [prompt, setPrompt] = useState("")
-  const { isGenerating, progress, videoUrl, error, generateVideo, reset } = useVideoGeneration()
+  const [prompt, setPrompt] = useState("");
+  const { isGenerating, progress, videoUrl, error, generateVideo, reset } =
+    useVideoGeneration();
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
-      e.preventDefault()
-      if (!prompt.trim() || isGenerating) return
-      await generateVideo(prompt.trim())
+      e.preventDefault();
+      if (!prompt.trim() || isGenerating) return;
+      await generateVideo(prompt.trim());
     },
-    [prompt, isGenerating, generateVideo],
-  )
+    [prompt, isGenerating, generateVideo]
+  );
 
   const handleNewVideo = useCallback(() => {
-    reset()
-    setPrompt("")
-  }, [reset])
+    reset();
+    setPrompt("");
+  }, [reset]);
 
   if (videoUrl) {
     return (
@@ -40,20 +41,23 @@ export function VideoGenerator() {
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   if (isGenerating) {
-    return <LoadingState progress={progress} prompt={prompt} />
+    return <LoadingState progress={progress} prompt={prompt} />;
   }
 
   return (
     <div className="text-center space-y-12">
       {/* Hero Section */}
       <div className="space-y-6">
-        <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight">What can I help you build?</h1>
-        <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-          Transform your ideas into stunning videos with AI. Describe your vision and watch it come to life.
+        <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight">
+          What can I help you build?
+        </h1>
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+          Transform your ideas into stunning educational videos with AI.
+          Describe your scenario and watch it come to life.
         </p>
       </div>
 
@@ -62,35 +66,40 @@ export function VideoGenerator() {
         <div className="">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
-              <Textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="A cinematic drone shot of a futuristic city at sunset, with flying cars and neon lights reflecting off glass buildings..."
-                className="min-h-[140px] bg-[#151515] border-gray-700 text-white placeholder:text-gray-500 text-lg leading-relaxed resize-none focus:border-white focus:ring-1 focus:ring-white rounded-xl"
-                disabled={isGenerating}
-              />
+              <div className="border-[#2a2b32] border-2 focus:outline-1 focus:outline-white rounded-xl p-4 bg-[#151515] min-h-[140px] focus:border-white  ">
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="A Sphere to Cube animation with a rotating cube..."
+                  className="border-none text-white placeholder:text-gray-300 text-xl leading-relaxed resize-none font-normal rounded-xl p-2 focus:outline-none focus:ring-0 focus:border-none focus-visible:ring-0"
+                  disabled={isGenerating}
+                />
+
+                <div className="flex justify-end">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className=" bg-white text-black hover:bg-gray-100 font-semibold py-4 rounded-xl transition-all duration-200 group"
+                    disabled={!prompt.trim() || isGenerating}
+                  >
+                    <ArrowUp className="w-5 h-5 text-2xl group-hover:translate-x-1 transition-transform duration-200" />
+                  </Button>
+                </div>
+              </div>
 
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500">Be specific and descriptive for best results</span>
-                <span className="text-gray-400">{prompt.length}/500</span>
+                <span className="text-gray-300 ml-1">
+                  Be specific and descriptive for best results
+                </span>
+                <span className="text-gray-300 mr-1">{prompt.length}/500</span>
               </div>
             </div>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 ">
                 <p className="text-red-400 text-sm">{error}</p>
               </div>
             )}
-
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full bg-white text-black hover:bg-gray-100 font-semibold py-4 rounded-xl transition-all duration-200 group"
-              disabled={!prompt.trim() || isGenerating}
-            >
-              Generate Video
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
-            </Button>
           </form>
         </div>
       </div>
@@ -131,5 +140,5 @@ export function VideoGenerator() {
         </div>
       </div> */}
     </div>
-  )
+  );
 }

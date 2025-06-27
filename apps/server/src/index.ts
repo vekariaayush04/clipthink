@@ -2,10 +2,12 @@ import express from "express";
 import prisma from "@repo/db/store";
 import queue from "./lib/Queue";
 import createWorker from "./lib/Worker";
+import cors from "cors";
 
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.post("/create-user", async (req, res) => {
   const user = await prisma.user.create({

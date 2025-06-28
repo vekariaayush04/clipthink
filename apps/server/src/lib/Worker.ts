@@ -6,6 +6,8 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import prisma from "@repo/db/store";
 import uploadVideo from "./uploadVideo";
+import queue from "./Queue";
+import runManim from "./runManim";
 
 const execAsync = promisify(exec);
 
@@ -15,25 +17,43 @@ const createWorker = async () => {
   const worker = new Worker(
     "video-generation",
     async (job) => {
-      const { promptId, content } = job.data;
-      const output = await generateCode(content);
-      const { code, command } = JSON.parse(output || "{}");
-      console.log("worker started", job.id);
+      const { promptId, content , retries } = job.data;
+      const folderPath = `../videos/${promptId}}`;
 
+      //if the retries is greater than 2, update the prompt status to failed
+      if (retries > 2) {
+        await fs.rm(folderPath, { recursive: true });
+
+        await prisma.prompt.update({
+          where: { id: promptId },
+          data: { status: "FAILED" },
+        });
+        return promptId;
+      }
+
+      //generate the code
+      const output = await generateCode(content);
+      const { code, command , dependencies } = JSON.parse(output || "{}");
+      console.log("worker started", job.id);
+      // console.log(dependencies);
+      
       //create a folder with the promptId
-      const folderPath = `../videos/${promptId}`;
+      // const folderPath = `../videos/${promptId}}`;
       await fs.mkdir(folderPath, { recursive: true });
       //write the code to a file
-      await fs.writeFile(`${folderPath}/code.py`, code);
+      await fs.writeFile(`${folderPath}/manim_scene.py`, code);
 
       //run the command
-      const { stdout, stderr } = await execAsync(command, { cwd: folderPath });
+      // const { stdout, stderr } = await execAsync(command, { cwd: folderPath });
 
-      console.log("✅ Manim STDOUT:", stdout);
-      console.error("⚠️ Manim STDERR:", stderr);
+      // console.log("✅ Manim STDOUT:", stdout);
+      // console.error("⚠️ Manim STDERR:", stderr);
+
+      await runManim(["-m", "manim", "manim_scene.py", "SceneName", "-qk", "-o", "output.mp4"], folderPath);
+
 
       const videoUrl = await uploadVideo(
-        `${folderPath}/media/videos/code/2160p60/output.mp4`,
+        `${folderPath}/media/videos/manim_scene/2160p60/output.mp4`,
         promptId
       );
       console.log("uploading video to cloudinary", videoUrl);
@@ -48,14 +68,30 @@ const createWorker = async () => {
 
       return promptId;
     },
-    { connection, autorun: false }
+    { connection, autorun: false , maxStalledCount : 0 }
   );
 
   worker.on("completed", (job, result) => {
     console.log(`Job ${job.id} completed with result ${result}`);
   });
 
-  worker.on("failed", (job, err) => {
+  worker.on("failed", async (job, err) => {
+    // create entry and retry
+    const promptEntry = await prisma.prompt.update({
+      where: { id: job?.data.promptId as string },
+      data: { retries: { increment: 1 } },
+    });
+    console.log("retrying for " , promptEntry.retries , "time")
+
+    await queue.add("video-generation", {
+      promptId: promptEntry.id,
+      content: JSON.stringify({
+        content  : promptEntry.content,
+        error : err.message
+      }),
+      retries: promptEntry.retries,
+    });
+
     console.log(`${job?.id} has failed with ${err.message}`);
   });
   return worker;

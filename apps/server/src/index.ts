@@ -40,6 +40,7 @@ app.post("/generate-code", async (req, res) => {
   await queue.add("video-generation", {
     promptId: promptEntry.id,
     content: prompt as string,
+    retries: 0,
   });
 
   const worker = await createWorker();

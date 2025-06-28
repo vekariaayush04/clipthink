@@ -52,11 +52,11 @@ export function VideoGenerator() {
     <div className="text-center space-y-12">
       {/* Hero Section */}
       <div className="space-y-6">
-        <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight">
+        <h1 className="text-5xl md:text-5xl font-bold text-white leading-tight">
           What can I help you build?
         </h1>
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-          Transform your ideas into stunning educational videos with AI.
+        <p className="text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+          Transform your ideas into stunning 2D math animation videos with AI.
           Describe your scenario and watch it come to life.
         </p>
       </div>
@@ -66,12 +66,12 @@ export function VideoGenerator() {
         <div className="">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
-              <div className="border-[#2a2b32] border-2 focus:outline-1 focus:outline-white rounded-xl p-4 bg-[#151515] min-h-[140px] focus:border-white  ">
+              <div className="border-[#2a2b32] border-2 focus:outline-1 focus:outline-white rounded-xl p-4 min-h-[140px] dark:bg-secondary focus:border-white  ">
                 <Textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="A Sphere to Cube animation with a rotating cube..."
-                  className="border-none text-white placeholder:text-gray-300 text-xl leading-relaxed resize-none font-normal rounded-xl p-2 focus:outline-none focus:ring-0 focus:border-none focus-visible:ring-0"
+                  className="border-none shadow-none bg-auto text-white dark:bg-transparent placeholder:text-gray-300 !text-lg leading-relaxed resize-none font-normal rounded-xl p-2 focus:outline-none focus:ring-0 focus:border-none focus-visible:ring-0"
                   disabled={isGenerating}
                 />
 
@@ -79,7 +79,7 @@ export function VideoGenerator() {
                   <Button
                     type="submit"
                     size="lg"
-                    className=" bg-white text-black hover:bg-gray-100 font-semibold py-4 rounded-xl transition-all duration-200 group"
+                    className=""
                     disabled={!prompt.trim() || isGenerating}
                   >
                     <ArrowUp className="w-5 h-5 text-2xl group-hover:translate-x-1 transition-transform duration-200" />

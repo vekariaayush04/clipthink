@@ -27,7 +27,7 @@ export function useVideoGeneration() {
 
     try {
       // Step 1: Submit prompt to server
-      const response = await fetch("http://localhost:3000/generate-code", {
+      const response = await fetch("http://localhost:3000/api/v1/chat/generate-video", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,7 +39,11 @@ export function useVideoGeneration() {
         throw new Error("Failed to submit video generation request")
       }
 
-      const { promptId } = await response.json()
+      const { promptId , success} = await response.json()
+
+      if (!success) {
+        throw new Error("Not Enough Credits")
+      }
 
       // Step 2: Poll for completion
       await pollForCompletion(promptId)
@@ -58,7 +62,7 @@ export function useVideoGeneration() {
 
     const poll = async (): Promise<void> => {
       try {
-        const response = await fetch(`http://localhost:3000/get-url/${promptId}`)
+        const response = await fetch(`http://localhost:3000/api/v1/chat/get-status/${promptId}`)
 
         if (!response.ok) {
           throw new Error("Failed to check video status")

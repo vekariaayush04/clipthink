@@ -8,6 +8,23 @@ export const generateVideo = async (
   res: Response
 ): Promise<any> => {
   try {
+
+    //is credit available
+    const credits = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { credits: true },
+    });
+    console.log("here 1");
+    
+
+    if (credits?.credits === 0) {
+      return res.json({
+        success: false,
+        message: "You do not have enough credits",
+      });
+    }
+    console.log("here 2");
+
     const { prompt } = req.body;
 
     //make db entry for the prompt
@@ -15,14 +32,17 @@ export const generateVideo = async (
       data: {
         status: "PENDING",
         content: prompt as string,
-        userId: "1aa62ca1-5679-4a4c-ad16-edc2532f4468",
+        userId: req.user.id,
       },
     });
+    console.log("here 3");
+
     //add to queue
     await queue.add("video-generation", {
       promptId: promptEntry.id,
       content: prompt as string,
       retries: 0,
+      userId: req.user.id
     });
 
     const worker = await createWorker();
@@ -34,10 +54,12 @@ export const generateVideo = async (
       promptId: promptEntry.id,
     });
   } catch (error) {
+    console.log(error);
+    
     return res.json({
       success: false,
       message: "Video Generation Failed",
-      error,
+      error : {error},
     });
   }
 };

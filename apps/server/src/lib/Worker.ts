@@ -17,7 +17,7 @@ const createWorker = async () => {
   const worker = new Worker(
     "video-generation",
     async (job) => {
-      const { promptId, content , retries } = job.data;
+      const { promptId, content , retries , userId } = job.data;
       const folderPath = `../videos/${promptId}}`;
 
       //if the retries is greater than 2, update the prompt status to failed
@@ -62,6 +62,11 @@ const createWorker = async () => {
         where: { id: promptId },
         data: { status: "COMPLETED", videoUrl },
       });
+
+      await prisma.user.update({
+        where: { id: userId },
+        data: { credits: { decrement: 1 } },
+      })
 
       //delete the folder
       await fs.rm(folderPath, { recursive: true });

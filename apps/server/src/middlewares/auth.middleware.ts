@@ -29,6 +29,7 @@ export const authMiddleware = async (
                 id: true,
                 name: true,
                 email: true,
+                credits: true
             },
         });
         console.log(user);

@@ -32,6 +32,7 @@ export function useVideoGeneration() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ prompt }),
       })
 
@@ -62,7 +63,9 @@ export function useVideoGeneration() {
 
     const poll = async (): Promise<void> => {
       try {
-        const response = await fetch(`http://localhost:3000/api/v1/chat/get-status/${promptId}`)
+        const response = await fetch(`http://localhost:3000/api/v1/chat/get-status/${promptId}`, {
+          credentials: "include",
+        })
 
         if (!response.ok) {
           throw new Error("Failed to check video status")

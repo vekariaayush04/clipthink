@@ -4,10 +4,10 @@ import generateCode from "./Ai";
 import fs from "fs/promises";
 import { exec } from "child_process";
 import { promisify } from "util";
-import prisma from "@repo/db/store";
 import uploadVideo from "./uploadVideo";
 import queue from "./Queue";
 import runManim from "./runManim";
+import { prisma } from "./auth";
 
 const execAsync = promisify(exec);
 

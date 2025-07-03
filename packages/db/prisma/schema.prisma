@@ -15,18 +15,70 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  password  String
-  prompts   Prompt[]
-  createdAt DateTime @default(now())
+  id            String    @id @default(uuid())
+  email         String    @unique
+  emailVerified Boolean?
+  name          String?
+  image         String?
+  prompts       Prompt[]
+  credits       Int       @default(3)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
 }
 
 model Prompt {
   id        String   @id @default(uuid())
   content   String
-  videoUrl  String?  // optional if video is not generated yet
+  videoUrl  String? // optional if video is not generated yet
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   createdAt DateTime @default(now())

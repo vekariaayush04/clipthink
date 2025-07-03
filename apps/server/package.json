@@ -17,6 +17,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "bcryptjs": "^3.0.2",
+    "better-auth": "^1.2.12",
     "bullmq": "^5.56.0",
     "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",

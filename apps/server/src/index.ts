@@ -1,23 +1,27 @@
 import express from "express";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import authRouter from "./routes/auth.routes";
 import chatRouter from "./routes/chat.routes";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/auth";
 
 dotenv.config();
 
 const app = express();
 
-app.use(express.json());
-app.use(cookieParser());
-app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true,
-}));
+// app.use(cookieParser());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
 
-app.use("/api/v1/auth" , authRouter)
-app.use("/api/v1/chat" , chatRouter)
+// app.all('/api/v1/auth/{*any}', toNodeHandler(auth));
+app.all("/api/auth/{*any}", toNodeHandler(auth));
+app.use(express.json());
+app.use("/api/v1/chat", chatRouter);
 
 const PORT = process.env.PORT || 3000;
 

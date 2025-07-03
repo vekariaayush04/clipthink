@@ -1,6 +1,6 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-import prisma from "@repo/db/store";
 import { NextFunction, Response, Request } from "express";
+import { prisma } from "../lib/auth";
 
 export const authMiddleware = async (
     req: Request,

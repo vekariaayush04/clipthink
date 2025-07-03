@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { UserAvatar } from "./user-avatar"
+import { signOut, useSession } from "@/lib/auth-client"
 
 interface ProfileDropdownProps {
   user: {
@@ -31,14 +32,13 @@ export function ProfileDropdown({ user, onLogout }: ProfileDropdownProps) {
   const handleLogout = async () => {
     setIsLoading(true)
     // Simulate logout process
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    if (onLogout) {
-      onLogout()
-    } else {
-      // Default logout behavior
-      router.push("/auth")
-    }
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/auth"); // redirect to login page
+        },
+      },
+    });
     setIsLoading(false)
   }
 

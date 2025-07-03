@@ -1,17 +1,14 @@
+"use client"
 import AuthPage from "@/components/auth";
 import React from "react";
-import { auth } from "../auth";
-import { redirect } from "next/navigation";
 import { Navbar } from "@/components/navbar";
+import { useSession } from "@/lib/auth-client";
 
-const page = async () => {
-  const user = await auth();
-  if (user) {
-    redirect("/");
-  }
+const page = () => {
+  const { data: session } = useSession();
   return (
     <div className="flex h-screen flex-col max-w-screen box-border">
-      <Navbar isLoggedIn={user !== null} user={user?.user} />
+      <Navbar />
       <AuthPage />
     </div>
   );

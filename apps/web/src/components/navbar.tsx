@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useSession } from "@/lib/auth-client"; // import the auth client
 // import {
 //   Popover,
 //   PopoverContent,
@@ -13,18 +14,22 @@ import { useRouter } from "next/navigation";
 import { ProfileDropdown } from "./profile.dropdown";
 import { axiosInstance } from "@/lib/Axios";
 
-export function Navbar({ isLoggedIn, user }: { isLoggedIn: boolean, user: any }) {
-  console.log(isLoggedIn)
-  console.log(user)
+export function Navbar() {
+  const {
+    data: session,
+    isPending, //loading state
+    error, //error object
+    refetch, //refetch the session
+  } = useSession();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
-    const response = await axiosInstance.post('/auth/logout')
+    const response = await axiosInstance.post("/auth/logout");
     if (response.data.success) {
-      router.push('/auth')
+      router.push("/auth");
     }
-  }
+  };
 
   return (
     <>
@@ -36,35 +41,35 @@ export function Navbar({ isLoggedIn, user }: { isLoggedIn: boolean, user: any })
           <div className="text-lg font-semibold">ClipThink</div>
         </div>
 
-        {!isLoggedIn && (
+        {!session && (
           <div className="flex items-center gap-4">
-          <Button
-            className="text-md font-normal dark:bg-transparent hover:bg-transparent shadow-none"
-            onClick={() => router.push("/auth")}
-          >
-            Login
-          </Button>
-          <Button
-            className="text-md font-normal"
-            onClick={() => router.push("/auth")}
-          >
-            Sign Up
-          </Button>
-        </div>)}
-
-        {isLoggedIn && (
-            <div className="flex items-center gap-6 mr-3">
-              {/* display remaining credits */}
-              {/* //make more better ui for credits */}
-              <div className="text-md border border-secondary p-2 px-4 rounded-xl text-muted-foreground flex items-center gap-2">
-                <CreditCard className="w-4 h-4" />
-                Credits : {user.credits}
-              </div>  
-              {/* Profile Dropdown */}
-              <ProfileDropdown user={user} onLogout={handleLogout} />
-            </div>
+            <Button
+              className="text-md font-normal dark:bg-transparent hover:bg-transparent shadow-none"
+              onClick={() => router.push("/auth")}
+            >
+              Login
+            </Button>
+            <Button
+              className="text-md font-normal"
+              onClick={() => router.push("/auth")}
+            >
+              Sign Up
+            </Button>
+          </div>
         )}
 
+        {session && (
+          <div className="flex items-center gap-6 mr-3">
+            {/* display remaining credits */}
+            {/* //make more better ui for credits */}
+            <div className="text-md border border-secondary p-2 px-4 rounded-xl text-muted-foreground flex items-center gap-2">
+              <CreditCard className="w-4 h-4" />
+              Credits : {"3"}
+            </div>
+            {/* Profile Dropdown */}
+            <ProfileDropdown user={session.user} onLogout={handleLogout} />
+          </div>
+        )}
       </nav>
     </>
   );

@@ -10,8 +10,7 @@ import { ArrowRight, ArrowUp, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { toastStyle } from "@/lib/utils";
 
-
-export function VideoGenerator({ user }: { user: any }) {
+export function VideoGenerator() {
   const [prompt, setPrompt] = useState("");
   const { isGenerating, progress, videoUrl, error, generateVideo, reset } =
     useVideoGeneration();
@@ -20,12 +19,6 @@ export function VideoGenerator({ user }: { user: any }) {
     //check if user has enough credits
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (user.credits <= 0) {
-        toast.error("You don't have enough credits" ,{
-          style : toastStyle as any
-        });
-        return;
-      }
       if (!prompt.trim() || isGenerating) return;
       await generateVideo(prompt.trim());
     },

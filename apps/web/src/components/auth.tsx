@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/form";
 import { axiosInstance } from "@/lib/Axios";
 import { useRouter } from "next/navigation";
+import { signIn, signUp, useSession } from "@/lib/auth-client";
 
 // Validation schemas
 const loginSchema = z.object({
@@ -52,9 +53,16 @@ type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function AuthPage() {
   const router = useRouter();
+  const { data: session, isPending } = useSession();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (session && !isPending) {
+      router.push("/");
+    }
+  }, [session, isPending]);
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -73,33 +81,68 @@ export default function AuthPage() {
     },
   });
 
-  const onLoginSubmit = async (data: LoginFormData) => {
+  const onLoginSubmit = async (LoginData: LoginFormData) => {
     setIsLoading(true);
     // Simulate API call
-    const response = await axiosInstance.post("/auth/login", data);
-    const { data: responseData } = response;
-    if (responseData.success) {
-      console.log("Login data:", data);
-      router.push("/");
-    } else {
-      console.log("Login failed:", responseData.message);
-    }
-    setIsLoading(false);
+    const { data, error } = await signIn.email(
+      {
+        email: LoginData.email,
+        password: LoginData.password,
+      },
+      {
+        onRequest: (ctx) => {
+          setIsLoading(true);
+        },
+        onSuccess: (ctx) => {
+          setIsLoading(false);
+        },
+        onError: (ctx) => {
+          setIsLoading(false);
+          alert(ctx.error.message);
+        },
+      }
+    );
   };
 
-  const onSignupSubmit = async (data: SignupFormData) => {
+  const onSignupSubmit = async (SignupData: SignupFormData) => {
     setIsLoading(true);
     // Simulate API call
-    const response = await axiosInstance.post("/auth/register", data);
-    const { data: responseData } = response;
-    if (responseData.success) {
-      console.log("SignUp data:", data);
-      router.push("/");
-    } else {
-      console.log("SignUp failed:", responseData.message);
-    }
-    setIsLoading(false);
+    const { data, error } = await signUp.email(
+      {
+        email: SignupData.email,
+        password: SignupData.password,
+        name: SignupData.name,
+      },
+      {
+        onRequest: (ctx) => {
+          console.log(ctx);
+          setIsLoading(true);
+        },
+        onSuccess: (ctx) => {
+          console.log(ctx);
+          setIsLoading(false);
+          router.push("/");
+        },
+        onError: (ctx) => {
+          console.log(ctx);
+          setIsLoading(false);
+          alert(ctx.error.message);
+        },
+      }
+    );
+    console.log(data);
+    console.log(error);
   };
+
+  if (isPending) {
+    return (
+      <div className="flex-1 max-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-4">
+        <div className="w-full max-w-md animate-fade-in">
+          <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 max-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-4">
@@ -286,24 +329,28 @@ export default function AuthPage() {
                     className="space-y-4"
                   >
                     {/* <div className="grid grid-cols-2 gap-3"> */}
-                      <FormField
-                        control={signupForm.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>First name</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                <Input placeholder="John" className="pl-10 h-12" {...field} />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                    <FormField
+                      control={signupForm.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First name</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                placeholder="John"
+                                className="pl-10 h-12"
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                      {/* <FormField
+                    {/* <FormField
                         control={signupForm.control}
                         name=""
                         render={({ field }) => (

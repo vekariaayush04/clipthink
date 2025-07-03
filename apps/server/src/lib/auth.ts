@@ -4,15 +4,35 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import dotenv from "dotenv";
 dotenv.config();
 import { PrismaClient } from "@repo/db/store";
+import { customSession } from "better-auth/plugins";
 
-export const prisma : PrismaClient = new PrismaClient();
+export const prisma: PrismaClient = new PrismaClient();
 
 export const auth = betterAuth({
-  emailAndPassword:{
+  emailAndPassword: {
     enabled: true,
   },
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
-  trustedOrigins: [process.env.CLIENT_URL as string],
+  trustedOrigins: [process.env.CLIENT_URL as string, "http://192.168.1.5:5000"],
+  plugins: [
+    customSession(async ({ session, user }) => {
+      const credits = await prisma.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        select: {
+          credits: true,
+        },
+      });
+      return {
+        user: {
+          ...user,
+          credits: credits?.credits,
+        },
+        session,
+      };
+    }),
+  ],
 });

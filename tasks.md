@@ -2,8 +2,8 @@
 - auth                                 ✅
 - file structure improve               ✅
 - 3 free tries                         ✅
+- frontend auth and others things      ✅
 - save code in db
-- frontend auth and others things
 - show community generation for demo
 
 ### improvements

@@ -12,6 +12,7 @@ import {
   User,
   ArrowRight,
   Sparkles,
+  Loader,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -136,11 +137,15 @@ export default function AuthPage() {
 
   if (isPending) {
     return (
-      <div className="flex-1 max-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-4">
-        <div className="w-full max-w-md animate-fade-in">
-          <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+      <div className="flex h-screen flex-col max-w-screen box-border">
+      <div className="flex-1 bg-gradient-to-br from-background via-background to-muted/30 flex items-center justify-center">
+        <div className="container mx-auto px-6 py-12">
+          <div className="max-w-4xl mx-auto flex flex-col items-center justify-center">
+            <Loader className="w-12 h-12 text-white animate-spin" />
+          </div>
         </div>
       </div>
+    </div>
     );
   }
 

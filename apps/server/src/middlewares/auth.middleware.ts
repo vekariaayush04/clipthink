@@ -1,6 +1,7 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { NextFunction, Response, Request } from "express";
 import { prisma } from "../lib/auth";
+import { auth } from "../lib/auth";
 
 export const authMiddleware = async (
     req: Request,
@@ -8,39 +9,24 @@ export const authMiddleware = async (
     next: NextFunction,
 ): Promise<any> => {
     try {
-        const token = req.cookies.jwt;
-        console.log("Token from cookies:", token);
-        
-        if (!token) {
-            return res.status(401).json({
-                message: "Unauthorised",
-            });
-        }
-
-        console.log("Token found:", token);
-        
-        let decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-
-        const user = await prisma.user.findUnique({
-            where: {
-                id: decoded.id,
-            },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                credits: true
-            },
+        const session = await auth.api.getSession({
+            headers : req.headers as any
         });
-        console.log(user);
         
-        if (!user) {
+        if (!session){
+            return res.status(401).json({
+                message: "Unauthorised",
+            });
+        }
+        
+        
+        if (!session.user) {
             return res.status(401).json({
                 message: "Unauthorised",
             });
         }
 
-        req.user = user;
+        req.user = session.user
 
         next();
     } catch (error) {

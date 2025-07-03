@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { LogOut, Settings, User, HelpCircle, Bell } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { LogOut, Settings, User, HelpCircle, Bell } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,35 +12,34 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { UserAvatar } from "./user-avatar"
-import { signOut, useSession } from "@/lib/auth-client"
+} from "@/components/ui/dropdown-menu";
+import { UserAvatar } from "./user-avatar";
+import { signOut, useSession } from "@/lib/auth-client";
 
 interface ProfileDropdownProps {
   user: {
-    name: string
-    email: string
-    avatar?: string
-  }
-  onLogout?: () => void
+    name: string;
+    email: string;
+    avatar?: string;
+  };
+  onLogout?: () => void;
 }
 
-export function ProfileDropdown({ user, onLogout }: ProfileDropdownProps) {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+export function ProfileDropdown({ user }: ProfileDropdownProps) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     // Simulate logout process
-    await signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push("/auth"); // redirect to login page
-        },
-      },
-    });
-    setIsLoading(false)
-  }
+    try {
+      await signOut();
+      router.push("/auth");
+    } catch (err) {
+      console.error("Error during sign out:", err);
+    }
+    setIsLoading(false);
+  };
 
   const menuItems = [
     // {
@@ -63,8 +62,8 @@ export function ProfileDropdown({ user, onLogout }: ProfileDropdownProps) {
     //   label: "Help & Support",
     //   onClick: () => router.push("/help"),
     // },
-    {}
-  ]
+    {},
+  ];
 
   return (
     <DropdownMenu>
@@ -86,10 +85,10 @@ export function ProfileDropdown({ user, onLogout }: ProfileDropdownProps) {
           <div className="flex items-center gap-3">
             <UserAvatar user={user as any} size="md" />
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-semibold leading-none">
-                {user.name}
+              <p className="text-sm font-semibold leading-none">{user.name}</p>
+              <p className="text-xs text-muted-foreground leading-none">
+                {user.email}
               </p>
-              <p className="text-xs text-muted-foreground leading-none">{user.email}</p>
             </div>
           </div>
         </DropdownMenuLabel>
@@ -123,9 +122,11 @@ export function ProfileDropdown({ user, onLogout }: ProfileDropdownProps) {
           ) : (
             <LogOut className="h-4 w-4" />
           )}
-          <span className="text-sm font-medium">{isLoading ? "Signing out..." : "Sign out"}</span>
+          <span className="text-sm font-medium">
+            {isLoading ? "Signing out..." : "Sign out"}
+          </span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

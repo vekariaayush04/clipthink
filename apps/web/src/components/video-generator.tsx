@@ -9,8 +9,11 @@ import { useVideoGeneration } from "@/hooks/use-video-generation";
 import { ArrowRight, ArrowUp, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { toastStyle } from "@/lib/utils";
+import { r } from "node_modules/better-auth/dist/shared/better-auth.Da_FnxgM";
+import { useRouter } from "next/navigation";
 
 export function VideoGenerator() {
+  const router = useRouter();
   const [prompt, setPrompt] = useState("");
   const { isGenerating, progress, videoUrl, error, generateVideo, reset } =
     useVideoGeneration();
@@ -28,6 +31,7 @@ export function VideoGenerator() {
   const handleNewVideo = useCallback(() => {
     reset();
     setPrompt("");
+    router.push("/");
   }, [reset]);
 
   if (videoUrl) {

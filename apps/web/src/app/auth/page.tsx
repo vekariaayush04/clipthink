@@ -6,6 +6,7 @@ import { useSession } from "@/lib/auth-client";
 
 const page = () => {
   const { data: session } = useSession();
+  console.log(session);
   return (
     <div className="flex h-screen flex-col max-w-screen box-border">
       <Navbar />

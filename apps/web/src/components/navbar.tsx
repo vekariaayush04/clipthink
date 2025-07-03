@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useSession } from "@/lib/auth-client"; // import the auth client
+import { signOut, useSession } from "@/lib/auth-client"; // import the auth client
 // import {
 //   Popover,
 //   PopoverContent,
@@ -22,14 +22,6 @@ export function Navbar() {
     refetch, //refetch the session
   } = useSession();
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleLogout = async () => {
-    const response = await axiosInstance.post("/auth/logout");
-    if (response.data.success) {
-      router.push("/auth");
-    }
-  };
 
   return (
     <>
@@ -64,10 +56,10 @@ export function Navbar() {
             {/* //make more better ui for credits */}
             <div className="text-md border border-secondary p-2 px-4 rounded-xl text-muted-foreground flex items-center gap-2">
               <CreditCard className="w-4 h-4" />
-              Credits : {"3"}
+              Credits : {session.user.credits}
             </div>
             {/* Profile Dropdown */}
-            <ProfileDropdown user={session.user} onLogout={handleLogout} />
+            <ProfileDropdown user={session.user} />
           </div>
         )}
       </nav>

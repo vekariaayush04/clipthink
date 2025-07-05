@@ -1,4 +1,4 @@
-import { prisma } from "../lib/auth";
+import prisma from "@repo/db/store";
 import { Request, Response } from "express";
 import queue from "../lib/Queue";
 import createWorker from "../lib/Worker";
@@ -15,7 +15,6 @@ export const generateVideo = async (
       where: { id: req.user.id },
       select: { credits: true },
     });
-    console.log("here 1");
     
 
     if (credits?.credits === 0) {
@@ -24,7 +23,6 @@ export const generateVideo = async (
         message: "You do not have enough credits",
       });
     }
-    console.log("here 2");
 
     const { prompt } = req.body;
 
@@ -36,7 +34,6 @@ export const generateVideo = async (
         userId: req.user.id,
       },
     });
-    console.log("here 3");
 
     //add to queue
     await queue.add("video-generation", {
@@ -55,7 +52,6 @@ export const generateVideo = async (
       promptId: promptEntry.id,
     });
   } catch (error) {
-    console.log(error);
     
     return res.json({
       success: false,

@@ -3,10 +3,9 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 // If your Prisma file is located elsewhere, you can change the path
 import dotenv from "dotenv";
 dotenv.config();
-import { PrismaClient } from "@repo/db/store";
+import prisma from "@repo/db/store";
 import { customSession } from "better-auth/plugins";
 
-export const prisma: PrismaClient = new PrismaClient();
 
 export const auth = betterAuth({
   emailAndPassword: {
@@ -15,7 +14,7 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
-  trustedOrigins: [process.env.CLIENT_URL as string, "http://192.168.1.5:5000"],
+  trustedOrigins: [process.env.CLIENT_URL as string],
   plugins: [
     customSession(async ({ session, user }) => {
       const credits = await prisma.user.findUnique({
@@ -36,3 +35,5 @@ export const auth = betterAuth({
     }),
   ],
 });
+
+export type authType = typeof auth;

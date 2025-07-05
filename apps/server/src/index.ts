@@ -13,7 +13,7 @@ const app = express();
 // app.use(cookieParser());
 app.use(
   cors({
-    origin: [process.env.CLIENT_URL as string, "http://192.168.1.5:5000"],
+    origin: [process.env.CLIENT_URL as string],
     credentials: true,
   })
 );

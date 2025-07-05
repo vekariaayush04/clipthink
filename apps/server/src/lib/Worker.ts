@@ -7,7 +7,7 @@ import { promisify } from "util";
 import uploadVideo from "./uploadVideo";
 import queue from "./Queue";
 import runManim from "./runManim";
-import { prisma } from "./auth";
+import prisma from "@repo/db/store";
 
 const execAsync = promisify(exec);
 
